@@ -62,10 +62,6 @@ component output = "false" {
 			}
 		}
 
-		writeDump(arguments.resourceUri);
-		writeDump(variables.urlMappings);
-		abort;
-
 		//Nothing found, so 404
 		new bossmvc.exceptions.NotFoundException( "URL provided did not match any of the configured URL mappings defined" );
 	}
