@@ -1,3 +1,9 @@
+/**
+ *  This code is used to handle the matching of URL patterns and actions. The approach is based on 
+ * similar approaches used in the micro-app frameworks Sinatra/Ratpack etc, but a lot of this code is 
+ * a re-working of some code originally written by Ben Nadel (that's right, im bringing in the big guns for this!
+ * https://github.com/bennadel/ResourceMapper.cfc - MIT license)
+ **/
 component output = "false" {
 
 	public Router function init ( ) {
