@@ -4,6 +4,9 @@ component output="false" extends="BossApplication"{
 	this.sessionmanagement = true;
     this.sessiontimeout = createTimeSpan(0,0,30,0);
 	this.enablerobustexception  = "yes";
+	this.mappings[ "/views" ] = "";
+	this.mappings[ "/controllers" ] = "";
+	this.mappings[ "/assets" ] = "";
 	
 	//Controller discovery config:
 	application.annotateControllers = true;	//At startup we will scan the .cfcs inside "/controllers" andd look for annotated files
@@ -15,6 +18,7 @@ component output="false" extends="BossApplication"{
 	 * Sets the application root location variable and initialises the controller & routings for later use.
 	 */
 	public void function onApplicationStart(){
+		//Set application mappings so we can easily access files
 		application.APPLICATION_ROOT = getDirectoryFromPath(getCurrentTemplatePath());
 		initControllers();
 		initRouting();
@@ -26,6 +30,9 @@ component output="false" extends="BossApplication"{
 	 * Called on every request - routes the incoming request to the correct controller
 	 */
 	public void function onRequestStart(required string TargetPage) {
+		this.mappings[ "/views" ] = "#application.APPLICATION_ROOT#views/";
+		this.mappings[ "/controllers" ] = "#application.APPLICATION_ROOT#controllers/";
+		this.mappings[ "/assets" ] = "#application.APPLICATION_ROOT#assets/";
 		try{
 			routeRequest();
 		} catch ( Any e ) {
