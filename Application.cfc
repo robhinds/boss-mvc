@@ -18,6 +18,7 @@ component output="false" extends="BossApplication"{
 		application.APPLICATION_ROOT = getDirectoryFromPath(getCurrentTemplatePath());
 		initControllers();
 		initRouting();
+		initViews();
 	}
 
 	

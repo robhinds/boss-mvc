@@ -58,6 +58,36 @@ component output="false"{
 	    }
 	}
 	
+
+
+	public void function initViews() {
+		initViewConfig();
+		initViewRenderers();
+	}
+	
+	
+	/** initialise the renderer for rendering views **/
+	private void function initViewRenderers() {
+		application.framework.renderer = new rendering.RenderService();
+	}
+		
+	/** initialise the View layout config - assume all "*.config" files in the view directory are view definitions **/ 
+	private void function initViewConfig() {
+		if (directoryExists( "#application.APPLICATION_ROOT#views" ) ){
+			var local.viewConfigs = directoryList( "#application.APPLICATION_ROOT#views", true, "path", "*.config" );
+			for ( var local.config in local.viewConfigs ){
+				var local.viewStruct = deserializeJSON( fileRead( local.config ) );
+				if ( isArray( local.viewStruct ) ){
+					for ( local.viewDef in local.viewStruct ){
+						application.framework.views[ local.viewDef.name ] = local.viewDef;
+					}
+				} else {
+					application.framework.views[ local.viewStruct.name ] = local.viewStruct;
+				}
+			}
+		}
+	}
+	
 	
 	/**
 	 * Takes the current request and checks it against our defined patterns - if it finds a match then it calls
@@ -74,7 +104,16 @@ component output="false"{
 				&& structKeyExists( application.framework.controllers, local.controllerName ) ){
 			var local.controller = application.framework.controllers[local.controllerName];
 			var local.functionToInvoke = local.controller[local.functionName];
-			local.functionToInvoke( local.params );
+			
+			var local.viewDetails = local.functionToInvoke( local.params );
+			if ( arrayLen( local.viewDetails ) > 1 ) structAppend( local.params, local.viewDetails[2] );
+			var local.viewName = local.viewDetails[1];
+			if (structKeyExists( application.framework.views, local.viewName )){
+				var local.viewConfig = application.framework.views[ local.viewName  ];
+				application.framework.renderer.render( local.viewConfig, local.params );
+			} else {
+				new bossmvc.exceptions.ServerSideException( "View Definition Not Found: Could not find view to match #local.viewName# " );
+			}
 		} else {
 			new bossmvc.exceptions.ServerSideException( "Controller Action Invalid: Could not find controller to match #local.controllerName# " );
 		}
